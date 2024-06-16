@@ -19,7 +19,7 @@ const connect = async () => {
   try {
     logger(`Connecting to MongoDB: ${MONGO_URL}`);
     await client.connect();
-    status.db = client.db("plataform");
+    status.db = client.db("local");
   } catch (error) {
     logger(`Error connecting to MongoDB: ${error}`);
   }

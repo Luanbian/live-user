@@ -5,7 +5,7 @@ export const COLLECTION_USERS = "live_user";
 
 export const userSchema = z.object({
   name: z.string().default(""),
-  email: z.string(),
+  email: z.string().email(),
 });
 
 export type User = z.infer<typeof userSchema>;
