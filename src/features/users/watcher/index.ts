@@ -1,7 +1,6 @@
 import debug from "debug";
 import { COLLECTION_USERS, UserDocument } from "../model";
 import { getDb } from "../../../services";
-import { uniqueExecution } from "./uniqueExecution";
 
 const logger = debug("features:users:watcher");
 
@@ -27,6 +26,7 @@ const watch = async () => {
   }
 };
 
-uniqueExecution({
-  callback: watch,
-});
+// wait for the database to be ready
+setTimeout(() => {
+  watch();
+}, 1000);
