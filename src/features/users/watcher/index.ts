@@ -27,6 +27,24 @@ const watch = async () => {
     emitter.on(emitter.initial_users, () => {
       emitter.emit(emitter.list_users, status.data);
     });
+
+    const changeStream = getDb()
+      .collection(COLLECTION_USERS)
+      .watch([], { fullDocument: "updateLookup" });
+
+    changeStream.on("change", async (change) => {
+      if (change.operationType === "insert") {
+        if (!change.fullDocument) return;
+
+        const data: UserDocument = {
+          _id: change.fullDocument._id,
+          name: change.fullDocument.name,
+          email: change.fullDocument.email,
+        };
+        status.data.push(data);
+        emitter.emitCreateUser(data);
+      }
+    });
   } catch (error) {
     logger("Error watching users: %O", error);
   }
