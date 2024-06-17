@@ -1,6 +1,7 @@
 import debug from "debug";
 import { COLLECTION_USERS, UserDocument } from "../model";
 import { getDb } from "../../../services";
+import { emitter } from "../emitter";
 
 const logger = debug("features:users:watcher");
 
@@ -20,7 +21,12 @@ const watch = async () => {
       .collection<UserDocument>(COLLECTION_USERS)
       .find()
       .toArray()) as UserDocument[];
+
     status.data = users;
+
+    emitter.on(emitter.initial_users, () => {
+      emitter.emit(emitter.list_users, status.data);
+    });
   } catch (error) {
     logger("Error watching users: %O", error);
   }

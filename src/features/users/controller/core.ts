@@ -2,6 +2,7 @@ import debug from "debug";
 import { Router } from "express";
 import { validateBodyForCreateUser } from "./rules";
 import { model } from "..";
+import { emitter } from "../emitter";
 
 const logger = debug("features:users:controller");
 const route = Router();
@@ -36,6 +37,18 @@ route.get("/", async (req, res) => {
       res.write(`data: ${JSON.stringify(data)}\n\n`);
       return !(res.closed || res.destroyed);
     };
+
+    emitter.once(emitter.list_users, sendEvent);
+
+    emitter.emit(emitter.initial_users);
+
+    const removeListener = () => {
+      emitter.removeListener(emitter.list_users, sendEvent);
+    };
+
+    res.on("close", removeListener);
+    res.on("error", removeListener);
+    res.on("finish", removeListener);
   } catch (error) {
     logger("Get users failed: %O", error);
     res.write(`event: error\n`);
